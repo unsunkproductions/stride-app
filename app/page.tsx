@@ -1034,36 +1034,82 @@ const BottomNav = ({ view, setView }: { view: string; setView: (v: string) => vo
 };
 
 // ── Auth Gate ────────────────────────────────────────────────
+const USER_MAP: Record<string, string> = {
+  luis: 'luis@stride.local',
+  gi: 'gi@stride.local',
+};
+
 const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
-  const handleLogin = async () => {
+  const t = {
+    bg: '#F2F2F0', bgCard: '#FFFFFF',
+    text: '#0A0A0A', text3: '#6B6B6B',
+    accent: ACCENT, accentBg: '#1a1a0a',
+    border: 'rgba(10, 10, 10, 0.09)',
+    shadow: '0 4px 12px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03)',
+    font: '-apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true); setError('');
+    const email = USER_MAP[username.toLowerCase().trim()];
+    if (!email) { setError('Usuário inválido. Use "Luis" ou "Gi".'); setLoading(false); return; }
     const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-    if (err) setError(err.message);
+    if (err) setError('Senha incorreta.');
     else onLogin();
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: BG }}>
-      <div className="w-full max-w-sm space-y-6">
-        <div>
-          <div className="text-3xl font-light tracking-tight" style={{ color: TEXT, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>STRIDE</div>
-          <div className="text-xs mt-1" style={{ color: TEXT_DIM, fontFamily: MONO }}>Tracker de treino Luis & Gi</div>
+    <div style={{ minHeight: '100vh', background: t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: t.font, padding: 24 }}>
+      <div style={{ background: t.bgCard, borderRadius: 18, padding: '40px 36px', width: '100%', maxWidth: 360, boxShadow: t.shadow, border: `1px solid ${t.border}` }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ width: 48, height: 48, borderRadius: 14, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 22 }}>
+            💪
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: t.text }}>STRIDE</div>
+          <div style={{ fontSize: 13, color: t.text3, marginTop: 4 }}>Tracker de treino Luis & Gi</div>
         </div>
-        <div className="space-y-3">
-          <Input value={email} onChange={setEmail} placeholder="Email" type="email" />
-          <Input value={password} onChange={setPassword} placeholder="Senha" type="password" />
-          {error && <div className="text-xs" style={{ color: RED }}>{error}</div>}
-          <Button onClick={handleLogin} disabled={loading} className="w-full">
-            {loading ? 'Entrando...' : 'Entrar'}
-          </Button>
-        </div>
+
+        <form onSubmit={handleLogin}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+            {['Luis', 'Gi'].map(name => (
+              <button key={name} type="button" onClick={() => setUsername(name)}
+                style={{
+                  flex: 1, padding: '10px 0', borderRadius: 10,
+                  border: `1.5px solid ${username.toLowerCase() === name.toLowerCase() ? '#000' : t.border}`,
+                  background: username.toLowerCase() === name.toLowerCase() ? '#000' : 'transparent',
+                  color: username.toLowerCase() === name.toLowerCase() ? ACCENT : t.text3,
+                  fontSize: 14, fontWeight: 600, fontFamily: t.font, cursor: 'pointer', transition: 'all 150ms',
+                }}>{name}</button>
+            ))}
+          </div>
+
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: t.text3, marginBottom: 6, letterSpacing: 0.5, textTransform: 'uppercase' }}>Senha</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1px solid ${t.border}`, fontSize: 14, fontFamily: t.font, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA' }} />
+          </div>
+
+          {error && (
+            <div style={{ background: '#FCEDEB', color: '#C7382D', borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 16 }}>{error}</div>
+          )}
+
+          <button type="submit" disabled={loading || !username || !password}
+            style={{
+              width: '100%', padding: '12px 0', borderRadius: 12,
+              background: loading || !username || !password ? '#E0E0E0' : '#000',
+              color: loading || !username || !password ? '#999' : ACCENT,
+              border: 'none', fontSize: 15, fontWeight: 600, fontFamily: t.font,
+              cursor: loading || !username || !password ? 'not-allowed' : 'pointer', transition: 'background 150ms',
+            }}>{loading ? 'Entrando...' : 'Entrar'}</button>
+        </form>
       </div>
     </div>
   );
