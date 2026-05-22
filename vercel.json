@@ -1,0 +1,7 @@
+{
+  "crons": [
+    { "path": "/api/push/send?slot=peak", "schedule": "0 12 * * *" },
+    { "path": "/api/push/send?slot=trough", "schedule": "0 17 * * *" },
+    { "path": "/api/push/send?slot=recovery", "schedule": "0 23 * * *" }
+  ]
+}

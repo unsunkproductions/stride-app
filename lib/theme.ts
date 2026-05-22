@@ -1,0 +1,12 @@
+export const ACCENT = '#C6F432';
+export const RED = '#FF3B47';
+export const AMBER = '#FFB23F';
+export const PINK = '#FF6B9D';
+export const BG = '#000000';
+export const SURFACE = '#0A0A0A';
+export const SURFACE_2 = '#141414';
+export const BORDER = '#1F1F1F';
+export const TEXT = '#FAFAFA';
+export const TEXT_DIM = '#8A8A8A';
+export const TEXT_DIMMER = '#4A4A4A';
+export const MONO = 'ui-monospace, SFMono-Regular, monospace';
